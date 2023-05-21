@@ -12,6 +12,7 @@
 
 const { configure } = require('quasar/wrappers');
 const { BytenodeWebpackPlugin } = require('@herberttn/bytenode-webpack-plugin');
+const WebpackObfuscator = require('webpack-obfuscator');
 
 module.exports = configure(function (ctx) {
   return {
@@ -73,7 +74,9 @@ module.exports = configure(function (ctx) {
 
       // https://v2.quasar.dev/quasar-cli-webpack/handling-webpack
       // "chain" is a webpack-chain object https://github.com/neutrinojs/webpack-chain
-      // chainWebpack (/* chain */) {}
+      chainWebpack(chain) {
+        chain.plugin('obfuscator').use(WebpackObfuscator, [{}]);
+      },
     },
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-webpack/quasar-config-js#Property%3A-devServer
