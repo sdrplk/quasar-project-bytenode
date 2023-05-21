@@ -11,8 +11,8 @@
 
 /* eslint-disable @typescript-eslint/no-var-requires */
 
-
 const { configure } = require('quasar/wrappers');
+const { BytenodeWebpackPlugin } = require('@herberttn/bytenode-webpack-plugin');
 
 module.exports = configure(function (ctx) {
   return {
@@ -203,7 +203,6 @@ module.exports = configure(function (ctx) {
         // appCategoryType: '',
         // osxSign: '',
         // protocol: 'myapp://path',
-
         // Windows only
         // win32metadata: { ... }
       },
@@ -215,16 +214,32 @@ module.exports = configure(function (ctx) {
       },
 
       // "chain" is a webpack-chain object https://github.com/neutrinojs/webpack-chain
-      chainWebpackMain (/* chain */) {
+      chainWebpackMain(chain) {
         // do something with the Electron main process Webpack cfg
         // extendWebpackMain also available besides this chainWebpackMain
+        chain
+          .plugin('@herberttn/bytenode-webpack-plugin')
+          .use(BytenodeWebpackPlugin, [
+            {
+              compileForElectron: true,
+            },
+          ]);
+        chain.output.filename('[name].js');
       },
 
       // "chain" is a webpack-chain object https://github.com/neutrinojs/webpack-chain
-      chainWebpackPreload (/* chain */) {
+      chainWebpackPreload(chain) {
         // do something with the Electron main process Webpack cfg
         // extendWebpackPreload also available besides this chainWebpackPreload
-      }
-    }
-  }
+        chain
+          .plugin('@herberttn/bytenode-webpack-plugin')
+          .use(BytenodeWebpackPlugin, [
+            {
+              compileForElectron: true,
+            },
+          ]);
+        chain.output.filename('[name].js');
+      },
+    },
+  };
 });
