@@ -76,6 +76,10 @@ module.exports = configure(function (ctx) {
       // "chain" is a webpack-chain object https://github.com/neutrinojs/webpack-chain
       chainWebpack(chain) {
         chain.plugin('obfuscator').use(WebpackObfuscator, [{}]);
+        // chain
+        //   .plugin('@herberttn/bytenode-webpack-plugin')
+        //   .use(BytenodeWebpackPlugin, []);
+        // chain.output.filename('[name].js');
       },
     },
 
