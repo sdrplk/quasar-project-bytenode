@@ -9,10 +9,12 @@
 // https://v2.quasar.dev/quasar-cli-webpack/quasar-config-js
 
 /* eslint-disable @typescript-eslint/no-var-requires */
-
+const asarmor = require('asarmor');
+const { join } = require('path');
 const { configure } = require('quasar/wrappers');
 const { BytenodeWebpackPlugin } = require('@herberttn/bytenode-webpack-plugin');
 const WebpackObfuscator = require('webpack-obfuscator');
+const { serialHooks } = require('electron-packager/src/hooks');
 
 module.exports = configure(function (ctx) {
   return {
@@ -205,12 +207,30 @@ module.exports = configure(function (ctx) {
         // protocol: 'myapp://path',
         // Windows only
         // win32metadata: { ... }
+
+        afterComplete: [
+          serialHooks([
+            async (buildPath, electronVersion, platform, arch) => {
+              try {
+                const asarPath = join(buildPath, 'resources', 'app.asar');
+                console.log(asarPath);
+                console.log(`asarmor applying patches to ${asarPath}`);
+                const archive = await asarmor.open(asarPath);
+                archive.patch(); // apply default patches
+                await archive.write(asarPath);
+              } catch (err) {
+                console.error(err);
+              }
+            },
+          ]),
+        ],
       },
 
       builder: {
         // https://www.electron.build/configuration/configuration
 
         appId: 'quasar-project',
+        afterPack: './afterPack.js',
       },
 
       // "chain" is a webpack-chain object https://github.com/neutrinojs/webpack-chain
